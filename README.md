@@ -1,6 +1,9 @@
+
 # Getting Started with Create React App
 
+#can view the project on https://garvjain24.github.io/weatherApiTest/
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
 
 ## Available Scripts
 
