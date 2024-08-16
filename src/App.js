@@ -1,23 +1,91 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import "./App.css";
+import axios from "axios";
 
 function App() {
+  const [city, setCity] = useState("");
+  const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
+  const [error, setError] = useState(null);
+
+  const ApiKey = "f5691be9317a02cdef90ff1f3650d22c";
+
+  const fetchWeather = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${ApiKey}`
+      );
+      setWeather(response.data);
+      setError("");
+    } catch (err) {
+      setError("City not found");
+      setWeather(null);
+    }
+  };
+
+  const fetchForecast = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${ApiKey}`
+      );
+      setForecast(response.data);
+      setError("");
+    } catch (err) {
+      console.log(err);
+      setError("Could not fetch forecast");
+      setForecast(null);
+    }
+  };
+
+  useEffect(() => {
+    if (weather) {
+      fetchForecast();
+    }
+  }, [weather]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (city.trim()) {
+      fetchWeather();
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Weather App</h1>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Enter city"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+        />
+        <button type="submit">Search</button>
+      </form>
+      {error && <p>{error}</p>}
+      {weather && (
+        <div className="weather-info">
+          <h2>{weather.name}</h2>
+          <p>{weather.weather[0].description}</p>
+          <p>Temperature: {weather.main.temp}°C</p>
+          <p>Humidity: {weather.main.humidity}%</p>
+        </div>
+      )}
+
+      {forecast && (
+        <div className="forecast">
+          <h3>5-Day Forecast</h3>
+          <div className="forecast-container">
+            {forecast.list.map((item, index) => (
+              <div key={index} className="forecast-item">
+                <p>{new Date(item.dt_txt).toLocaleString()}</p>
+                <p>{item.weather[0].description}</p>
+                <p>Temp: {item.main.temp}°C</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
