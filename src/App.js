@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import axios from "axios";
 
@@ -23,7 +23,7 @@ function App() {
     }
   };
 
-  const fetchForecast = async () => {
+  const fetchForecast = useCallback(async () => {
     try {
       const response = await axios.get(
         `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${ApiKey}`
@@ -35,13 +35,13 @@ function App() {
       setError("Could not fetch forecast");
       setForecast(null);
     }
-  };
+  }, [city, ApiKey]);
 
   useEffect(() => {
     if (weather) {
       fetchForecast();
     }
-  }, [weather]);
+  }, [weather, fetchForecast]);
 
   const handleSearch = (e) => {
     e.preventDefault();
